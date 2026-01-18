@@ -65,7 +65,7 @@ SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
 # crd-ref-docs version
-CRD_REF_VERSION := v0.0.9
+CRD_REF_VERSION := v0.2.0
 
 .PHONY: all
 all: build
