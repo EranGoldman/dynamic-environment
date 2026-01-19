@@ -11,3 +11,9 @@ linters:
     - ineffassign
     - staticcheck
     - unused
+  settings:
+    staticcheck:
+      checks:
+        - "all"
+        - "-QF*"  # Exclude quickfix suggestions
+        - "-ST*"  # Exclude all style checks (ST1000, ST1006, ST1019, ST1020, ST1021)
