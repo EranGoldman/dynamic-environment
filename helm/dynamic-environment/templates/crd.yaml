@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: $(CERTIFICATE_NAMESPACE)/$(CERTIFICATE_NAME)
-    controller-gen.kubebuilder.io/version: v0.9.2
+    controller-gen.kubebuilder.io/version: v0.20.0
   name: dynamicenvs.riskified.com
 spec:
   group: riskified.com
@@ -38,10 +38,19 @@ spec:
         description: DynamicEnv is the Schema for the dynamicenvs API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -49,36 +58,62 @@ spec:
             description: DynamicEnvSpec defines the desired state of DynamicEnv
             properties:
               consumers:
-                description: Consumers are like subsets but for deployments that do not open a service but connect to external resources for their work (e.g., offline workers). They are equivalent to subsets in the sense that they launch overriding deployments with custom image and/or settings. However, since they are only consumers, no virtual service or destination route will be pointing to them.
+                description: |-
+                  Consumers are like subsets but for deployments that do not open a service but connect to external resources for
+                  their work (e.g., offline workers). They are equivalent to subsets in the sense that they launch overriding
+                  deployments with custom image and/or settings. However, since they are only consumers, no virtual service or
+                  destination route will be pointing to them.
                 items:
-                  description: Subsets define how to generate subsets from existing Deployments
+                  description: Subsets define how to generate subsets from existing
+                    Deployments
                   properties:
                     containers:
-                      description: A list of container overrides (at least one of Containers or InitContainers must not be empty)
+                      description: A list of container overrides (at least one of
+                        Containers or InitContainers must not be empty)
                       items:
-                        description: Defines the details of the container on which changes need to be made and the relevant overrides
+                        description: |-
+                          Defines the details of the container on which changes need to be made
+                          and the relevant overrides
                         properties:
                           command:
-                            description: Entrypoint array overridden to the desired subset The docker image's ENTRYPOINT is used if this is not provided.
+                            description: |-
+                              Entrypoint array overridden to the desired subset
+                              The docker image's ENTRYPOINT is used if this is not provided.
                             items:
                               type: string
                             type: array
                           containerName:
-                            description: Container name to override in multiple containers' environment. If not specified, we will use the first container.
+                            description: |-
+                              Container name to override in multiple containers' environment. If not
+                               specified, we will use the first container.
                             type: string
                           env:
-                            description: Additional environment variable to the given deployment
+                            description: Additional environment variable to the given
+                              deployment
                             items:
-                              description: EnvVar represents an environment variable present in a Container.
+                              description: EnvVar represents an environment variable
+                                present in a Container.
                               properties:
                                 name:
-                                  description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                  description: |-
+                                    Name of the environment variable.
+                                    May consist of any printable ASCII characters except '='.
                                   type: string
                                 value:
-                                  description: 'Variable references $(VAR_NAME) are expanded using the previously defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
+                                  description: |-
+                                    Variable references $(VAR_NAME) are expanded
+                                    using the previously defined environment variables in the container and
+                                    any service environment variables. If a variable cannot be resolved,
+                                    the reference in the input string will be unchanged. Double $$ are reduced
+                                    to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                                    "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                                    Escaped references will never be expanded, regardless of whether the variable
+                                    exists or not.
+                                    Defaults to "".
                                   type: string
                                 valueFrom:
-                                  description: Source for the environment variable's value. Cannot be used if value is not empty.
+                                  description: Source for the environment variable's
+                                    value. Cannot be used if value is not empty.
                                   properties:
                                     configMapKeyRef:
                                       description: Selects a key of a ConfigMap.
@@ -87,39 +122,92 @@ spec:
                                           description: The key to select.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the ConfigMap or its key must be defined
+                                          description: Specify whether the ConfigMap
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     fieldRef:
-                                      description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                                      description: |-
+                                        Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+                                        spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
                                       properties:
                                         apiVersion:
-                                          description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
+                                          description: Version of the schema the FieldPath
+                                            is written in terms of, defaults to "v1".
                                           type: string
                                         fieldPath:
-                                          description: Path of the field to select in the specified API version.
+                                          description: Path of the field to select
+                                            in the specified API version.
                                           type: string
                                       required:
                                       - fieldPath
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    fileKeyRef:
+                                      description: |-
+                                        FileKeyRef selects a key of the env file.
+                                        Requires the EnvFiles feature gate to be enabled.
+                                      properties:
+                                        key:
+                                          description: |-
+                                            The key within the env file. An invalid key will prevent the pod from starting.
+                                            The keys defined within a source may consist of any printable ASCII characters except '='.
+                                            During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                          type: string
+                                        optional:
+                                          default: false
+                                          description: |-
+                                            Specify whether the file or its key must be defined. If the file or key
+                                            does not exist, then the env var is not published.
+                                            If optional is set to true and the specified key does not exist,
+                                            the environment variable will not be set in the Pod's containers.
+
+                                            If optional is set to false and the specified key does not exist,
+                                            an error will be returned during Pod creation.
+                                          type: boolean
+                                        path:
+                                          description: |-
+                                            The path within the volume from which to select the file.
+                                            Must be relative and may not contain the '..' path or start with '..'.
+                                          type: string
+                                        volumeName:
+                                          description: The name of the volume mount
+                                            containing the env file.
+                                          type: string
+                                      required:
+                                      - key
+                                      - path
+                                      - volumeName
+                                      type: object
+                                      x-kubernetes-map-type: atomic
                                     resourceFieldRef:
-                                      description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
+                                      description: |-
+                                        Selects a resource of the container: only resources limits and requests
+                                        (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
                                       properties:
                                         containerName:
-                                          description: 'Container name: required for volumes, optional for env vars'
+                                          description: 'Container name: required for
+                                            volumes, optional for env vars'
                                           type: string
                                         divisor:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          description: Specifies the output format of the exposed resources, defaults to "1"
+                                          description: Specifies the output format
+                                            of the exposed resources, defaults to
+                                            "1"
                                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                           x-kubernetes-int-or-string: true
                                         resource:
@@ -130,16 +218,25 @@ spec:
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     secretKeyRef:
-                                      description: Selects a key of a secret in the pod's namespace
+                                      description: Selects a key of a secret in the
+                                        pod's namespace
                                       properties:
                                         key:
-                                          description: The key of the secret to select from.  Must be a valid secret key.
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the Secret or its key must be defined
+                                          description: Specify whether the Secret
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
@@ -151,41 +248,66 @@ spec:
                               type: object
                             type: array
                           image:
-                            description: Docker image name overridden to the desired subset The Docker image found in the original deployment is used if this is not provided.
+                            description: |-
+                              Docker image name overridden to the desired subset
+                              The Docker image found in the original deployment is used if this is not provided.
                             type: string
                         required:
                         - containerName
                         type: object
                       type: array
                     defaultVersion:
-                      description: Default version for this subset (if different then the global default version). This is the version that will get the default route.
+                      description: |-
+                        Default version for this subset (if different then the global default version). This is the
+                        version that will get the default route.
                       type: string
                     initContainers:
-                      description: A list of init container overrides (at least one of Containers or InitContainers must not be empty)
+                      description: A list of init container overrides (at least one
+                        of Containers or InitContainers must not be empty)
                       items:
-                        description: Defines the details of the container on which changes need to be made and the relevant overrides
+                        description: |-
+                          Defines the details of the container on which changes need to be made
+                          and the relevant overrides
                         properties:
                           command:
-                            description: Entrypoint array overridden to the desired subset The docker image's ENTRYPOINT is used if this is not provided.
+                            description: |-
+                              Entrypoint array overridden to the desired subset
+                              The docker image's ENTRYPOINT is used if this is not provided.
                             items:
                               type: string
                             type: array
                           containerName:
-                            description: Container name to override in multiple containers' environment. If not specified, we will use the first container.
+                            description: |-
+                              Container name to override in multiple containers' environment. If not
+                               specified, we will use the first container.
                             type: string
                           env:
-                            description: Additional environment variable to the given deployment
+                            description: Additional environment variable to the given
+                              deployment
                             items:
-                              description: EnvVar represents an environment variable present in a Container.
+                              description: EnvVar represents an environment variable
+                                present in a Container.
                               properties:
                                 name:
-                                  description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                  description: |-
+                                    Name of the environment variable.
+                                    May consist of any printable ASCII characters except '='.
                                   type: string
                                 value:
-                                  description: 'Variable references $(VAR_NAME) are expanded using the previously defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
+                                  description: |-
+                                    Variable references $(VAR_NAME) are expanded
+                                    using the previously defined environment variables in the container and
+                                    any service environment variables. If a variable cannot be resolved,
+                                    the reference in the input string will be unchanged. Double $$ are reduced
+                                    to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                                    "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                                    Escaped references will never be expanded, regardless of whether the variable
+                                    exists or not.
+                                    Defaults to "".
                                   type: string
                                 valueFrom:
-                                  description: Source for the environment variable's value. Cannot be used if value is not empty.
+                                  description: Source for the environment variable's
+                                    value. Cannot be used if value is not empty.
                                   properties:
                                     configMapKeyRef:
                                       description: Selects a key of a ConfigMap.
@@ -194,39 +316,92 @@ spec:
                                           description: The key to select.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the ConfigMap or its key must be defined
+                                          description: Specify whether the ConfigMap
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     fieldRef:
-                                      description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                                      description: |-
+                                        Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+                                        spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
                                       properties:
                                         apiVersion:
-                                          description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
+                                          description: Version of the schema the FieldPath
+                                            is written in terms of, defaults to "v1".
                                           type: string
                                         fieldPath:
-                                          description: Path of the field to select in the specified API version.
+                                          description: Path of the field to select
+                                            in the specified API version.
                                           type: string
                                       required:
                                       - fieldPath
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    fileKeyRef:
+                                      description: |-
+                                        FileKeyRef selects a key of the env file.
+                                        Requires the EnvFiles feature gate to be enabled.
+                                      properties:
+                                        key:
+                                          description: |-
+                                            The key within the env file. An invalid key will prevent the pod from starting.
+                                            The keys defined within a source may consist of any printable ASCII characters except '='.
+                                            During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                          type: string
+                                        optional:
+                                          default: false
+                                          description: |-
+                                            Specify whether the file or its key must be defined. If the file or key
+                                            does not exist, then the env var is not published.
+                                            If optional is set to true and the specified key does not exist,
+                                            the environment variable will not be set in the Pod's containers.
+
+                                            If optional is set to false and the specified key does not exist,
+                                            an error will be returned during Pod creation.
+                                          type: boolean
+                                        path:
+                                          description: |-
+                                            The path within the volume from which to select the file.
+                                            Must be relative and may not contain the '..' path or start with '..'.
+                                          type: string
+                                        volumeName:
+                                          description: The name of the volume mount
+                                            containing the env file.
+                                          type: string
+                                      required:
+                                      - key
+                                      - path
+                                      - volumeName
+                                      type: object
+                                      x-kubernetes-map-type: atomic
                                     resourceFieldRef:
-                                      description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
+                                      description: |-
+                                        Selects a resource of the container: only resources limits and requests
+                                        (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
                                       properties:
                                         containerName:
-                                          description: 'Container name: required for volumes, optional for env vars'
+                                          description: 'Container name: required for
+                                            volumes, optional for env vars'
                                           type: string
                                         divisor:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          description: Specifies the output format of the exposed resources, defaults to "1"
+                                          description: Specifies the output format
+                                            of the exposed resources, defaults to
+                                            "1"
                                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                           x-kubernetes-int-or-string: true
                                         resource:
@@ -237,16 +412,25 @@ spec:
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     secretKeyRef:
-                                      description: Selects a key of a secret in the pod's namespace
+                                      description: Selects a key of a secret in the
+                                        pod's namespace
                                       properties:
                                         key:
-                                          description: The key of the secret to select from.  Must be a valid secret key.
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the Secret or its key must be defined
+                                          description: Specify whether the Secret
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
@@ -258,7 +442,9 @@ spec:
                               type: object
                             type: array
                           image:
-                            description: Docker image name overridden to the desired subset The Docker image found in the original deployment is used if this is not provided.
+                            description: |-
+                              Docker image name overridden to the desired subset
+                              The Docker image found in the original deployment is used if this is not provided.
                             type: string
                         required:
                         - containerName
@@ -273,10 +459,13 @@ spec:
                     podLabels:
                       additionalProperties:
                         type: string
-                      description: Labels to add to the pods of the deployment launched by this subset. Could be used in conjunction with 'SourceLabels' in the `IstioMatches`.
+                      description: |-
+                        Labels to add to the pods of the deployment launched by this subset. Could be used in
+                        conjunction with 'SourceLabels' in the `IstioMatches`.
                       type: object
                     replicas:
-                      description: 'Number of deployment replicas. Default is 1. Note: 0 is *invalid*.'
+                      description: 'Number of deployment replicas. Default is 1. Note:
+                        0 is *invalid*.'
                       format: int32
                       type: integer
                   required:
@@ -285,13 +474,19 @@ spec:
                   type: object
                 type: array
               istioMatches:
-                description: A list of matchers (partly corresponds to IstioMatch). Each match will have a rule of its own (merged with existing rules) ordered by their order here.
+                description: |-
+                  A list of matchers (partly corresponds to IstioMatch). Each match will have a rule of its
+                  own (merged with existing rules) ordered by their order here.
                 items:
-                  description: specifies a set of criterion to be met in order for the rule to be applied to the HTTP request This field is immutable after creation.
+                  description: |-
+                    specifies a set of criterion to be met in order for the rule to be applied to the HTTP request
+                    This field is immutable after creation.
                   properties:
                     headers:
                       additionalProperties:
-                        description: Describes how to match a given string in HTTP headers. Match is case-sensitive. one and only one of the fields needs to be defined (oneof)
+                        description: |-
+                          Describes how to match a given string in HTTP headers. Match is case-sensitive.
+                          one and only one of the fields needs to be defined (oneof)
                         properties:
                           exact:
                             type: string
@@ -300,46 +495,74 @@ spec:
                           regex:
                             type: string
                         type: object
-                      description: 'Header values are case-sensitive and formatted as follows:<br/> - `exact: "value"` for exact string match<br/> - `prefix: "value"` for prefix-based match<br/> - `regex: "value"` for RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).'
+                      description: |-
+                        Header values are case-sensitive and formatted as follows:<br/>
+                        - `exact: "value"` for exact string match<br/>
+                        - `prefix: "value"` for prefix-based match<br/>
+                        - `regex: "value"` for RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
                       type: object
                     sourceLabels:
                       additionalProperties:
                         type: string
-                      description: One or more labels that constrain the applicability of a rule to source (client) workloads with the given labels.
+                      description: |-
+                        One or more labels that constrain the applicability of a rule to source (client) workloads
+                        with the given labels.
                       type: object
                   type: object
                 type: array
               subsets:
                 description: Who should participate in the given dynamic environment
                 items:
-                  description: Subsets define how to generate subsets from existing Deployments
+                  description: Subsets define how to generate subsets from existing
+                    Deployments
                   properties:
                     containers:
-                      description: A list of container overrides (at least one of Containers or InitContainers must not be empty)
+                      description: A list of container overrides (at least one of
+                        Containers or InitContainers must not be empty)
                       items:
-                        description: Defines the details of the container on which changes need to be made and the relevant overrides
+                        description: |-
+                          Defines the details of the container on which changes need to be made
+                          and the relevant overrides
                         properties:
                           command:
-                            description: Entrypoint array overridden to the desired subset The docker image's ENTRYPOINT is used if this is not provided.
+                            description: |-
+                              Entrypoint array overridden to the desired subset
+                              The docker image's ENTRYPOINT is used if this is not provided.
                             items:
                               type: string
                             type: array
                           containerName:
-                            description: Container name to override in multiple containers' environment. If not specified, we will use the first container.
+                            description: |-
+                              Container name to override in multiple containers' environment. If not
+                               specified, we will use the first container.
                             type: string
                           env:
-                            description: Additional environment variable to the given deployment
+                            description: Additional environment variable to the given
+                              deployment
                             items:
-                              description: EnvVar represents an environment variable present in a Container.
+                              description: EnvVar represents an environment variable
+                                present in a Container.
                               properties:
                                 name:
-                                  description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                  description: |-
+                                    Name of the environment variable.
+                                    May consist of any printable ASCII characters except '='.
                                   type: string
                                 value:
-                                  description: 'Variable references $(VAR_NAME) are expanded using the previously defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
+                                  description: |-
+                                    Variable references $(VAR_NAME) are expanded
+                                    using the previously defined environment variables in the container and
+                                    any service environment variables. If a variable cannot be resolved,
+                                    the reference in the input string will be unchanged. Double $$ are reduced
+                                    to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                                    "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                                    Escaped references will never be expanded, regardless of whether the variable
+                                    exists or not.
+                                    Defaults to "".
                                   type: string
                                 valueFrom:
-                                  description: Source for the environment variable's value. Cannot be used if value is not empty.
+                                  description: Source for the environment variable's
+                                    value. Cannot be used if value is not empty.
                                   properties:
                                     configMapKeyRef:
                                       description: Selects a key of a ConfigMap.
@@ -348,39 +571,92 @@ spec:
                                           description: The key to select.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the ConfigMap or its key must be defined
+                                          description: Specify whether the ConfigMap
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     fieldRef:
-                                      description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                                      description: |-
+                                        Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+                                        spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
                                       properties:
                                         apiVersion:
-                                          description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
+                                          description: Version of the schema the FieldPath
+                                            is written in terms of, defaults to "v1".
                                           type: string
                                         fieldPath:
-                                          description: Path of the field to select in the specified API version.
+                                          description: Path of the field to select
+                                            in the specified API version.
                                           type: string
                                       required:
                                       - fieldPath
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    fileKeyRef:
+                                      description: |-
+                                        FileKeyRef selects a key of the env file.
+                                        Requires the EnvFiles feature gate to be enabled.
+                                      properties:
+                                        key:
+                                          description: |-
+                                            The key within the env file. An invalid key will prevent the pod from starting.
+                                            The keys defined within a source may consist of any printable ASCII characters except '='.
+                                            During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                          type: string
+                                        optional:
+                                          default: false
+                                          description: |-
+                                            Specify whether the file or its key must be defined. If the file or key
+                                            does not exist, then the env var is not published.
+                                            If optional is set to true and the specified key does not exist,
+                                            the environment variable will not be set in the Pod's containers.
+
+                                            If optional is set to false and the specified key does not exist,
+                                            an error will be returned during Pod creation.
+                                          type: boolean
+                                        path:
+                                          description: |-
+                                            The path within the volume from which to select the file.
+                                            Must be relative and may not contain the '..' path or start with '..'.
+                                          type: string
+                                        volumeName:
+                                          description: The name of the volume mount
+                                            containing the env file.
+                                          type: string
+                                      required:
+                                      - key
+                                      - path
+                                      - volumeName
+                                      type: object
+                                      x-kubernetes-map-type: atomic
                                     resourceFieldRef:
-                                      description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
+                                      description: |-
+                                        Selects a resource of the container: only resources limits and requests
+                                        (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
                                       properties:
                                         containerName:
-                                          description: 'Container name: required for volumes, optional for env vars'
+                                          description: 'Container name: required for
+                                            volumes, optional for env vars'
                                           type: string
                                         divisor:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          description: Specifies the output format of the exposed resources, defaults to "1"
+                                          description: Specifies the output format
+                                            of the exposed resources, defaults to
+                                            "1"
                                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                           x-kubernetes-int-or-string: true
                                         resource:
@@ -391,16 +667,25 @@ spec:
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     secretKeyRef:
-                                      description: Selects a key of a secret in the pod's namespace
+                                      description: Selects a key of a secret in the
+                                        pod's namespace
                                       properties:
                                         key:
-                                          description: The key of the secret to select from.  Must be a valid secret key.
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the Secret or its key must be defined
+                                          description: Specify whether the Secret
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
@@ -412,41 +697,66 @@ spec:
                               type: object
                             type: array
                           image:
-                            description: Docker image name overridden to the desired subset The Docker image found in the original deployment is used if this is not provided.
+                            description: |-
+                              Docker image name overridden to the desired subset
+                              The Docker image found in the original deployment is used if this is not provided.
                             type: string
                         required:
                         - containerName
                         type: object
                       type: array
                     defaultVersion:
-                      description: Default version for this subset (if different then the global default version). This is the version that will get the default route.
+                      description: |-
+                        Default version for this subset (if different then the global default version). This is the
+                        version that will get the default route.
                       type: string
                     initContainers:
-                      description: A list of init container overrides (at least one of Containers or InitContainers must not be empty)
+                      description: A list of init container overrides (at least one
+                        of Containers or InitContainers must not be empty)
                       items:
-                        description: Defines the details of the container on which changes need to be made and the relevant overrides
+                        description: |-
+                          Defines the details of the container on which changes need to be made
+                          and the relevant overrides
                         properties:
                           command:
-                            description: Entrypoint array overridden to the desired subset The docker image's ENTRYPOINT is used if this is not provided.
+                            description: |-
+                              Entrypoint array overridden to the desired subset
+                              The docker image's ENTRYPOINT is used if this is not provided.
                             items:
                               type: string
                             type: array
                           containerName:
-                            description: Container name to override in multiple containers' environment. If not specified, we will use the first container.
+                            description: |-
+                              Container name to override in multiple containers' environment. If not
+                               specified, we will use the first container.
                             type: string
                           env:
-                            description: Additional environment variable to the given deployment
+                            description: Additional environment variable to the given
+                              deployment
                             items:
-                              description: EnvVar represents an environment variable present in a Container.
+                              description: EnvVar represents an environment variable
+                                present in a Container.
                               properties:
                                 name:
-                                  description: Name of the environment variable. Must be a C_IDENTIFIER.
+                                  description: |-
+                                    Name of the environment variable.
+                                    May consist of any printable ASCII characters except '='.
                                   type: string
                                 value:
-                                  description: 'Variable references $(VAR_NAME) are expanded using the previously defined environment variables in the container and any service environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "".'
+                                  description: |-
+                                    Variable references $(VAR_NAME) are expanded
+                                    using the previously defined environment variables in the container and
+                                    any service environment variables. If a variable cannot be resolved,
+                                    the reference in the input string will be unchanged. Double $$ are reduced
+                                    to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                                    "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                                    Escaped references will never be expanded, regardless of whether the variable
+                                    exists or not.
+                                    Defaults to "".
                                   type: string
                                 valueFrom:
-                                  description: Source for the environment variable's value. Cannot be used if value is not empty.
+                                  description: Source for the environment variable's
+                                    value. Cannot be used if value is not empty.
                                   properties:
                                     configMapKeyRef:
                                       description: Selects a key of a ConfigMap.
@@ -455,39 +765,92 @@ spec:
                                           description: The key to select.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the ConfigMap or its key must be defined
+                                          description: Specify whether the ConfigMap
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     fieldRef:
-                                      description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`, `metadata.annotations[''<KEY>'']`, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
+                                      description: |-
+                                        Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+                                        spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
                                       properties:
                                         apiVersion:
-                                          description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
+                                          description: Version of the schema the FieldPath
+                                            is written in terms of, defaults to "v1".
                                           type: string
                                         fieldPath:
-                                          description: Path of the field to select in the specified API version.
+                                          description: Path of the field to select
+                                            in the specified API version.
                                           type: string
                                       required:
                                       - fieldPath
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    fileKeyRef:
+                                      description: |-
+                                        FileKeyRef selects a key of the env file.
+                                        Requires the EnvFiles feature gate to be enabled.
+                                      properties:
+                                        key:
+                                          description: |-
+                                            The key within the env file. An invalid key will prevent the pod from starting.
+                                            The keys defined within a source may consist of any printable ASCII characters except '='.
+                                            During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                                          type: string
+                                        optional:
+                                          default: false
+                                          description: |-
+                                            Specify whether the file or its key must be defined. If the file or key
+                                            does not exist, then the env var is not published.
+                                            If optional is set to true and the specified key does not exist,
+                                            the environment variable will not be set in the Pod's containers.
+
+                                            If optional is set to false and the specified key does not exist,
+                                            an error will be returned during Pod creation.
+                                          type: boolean
+                                        path:
+                                          description: |-
+                                            The path within the volume from which to select the file.
+                                            Must be relative and may not contain the '..' path or start with '..'.
+                                          type: string
+                                        volumeName:
+                                          description: The name of the volume mount
+                                            containing the env file.
+                                          type: string
+                                      required:
+                                      - key
+                                      - path
+                                      - volumeName
+                                      type: object
+                                      x-kubernetes-map-type: atomic
                                     resourceFieldRef:
-                                      description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.'
+                                      description: |-
+                                        Selects a resource of the container: only resources limits and requests
+                                        (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
                                       properties:
                                         containerName:
-                                          description: 'Container name: required for volumes, optional for env vars'
+                                          description: 'Container name: required for
+                                            volumes, optional for env vars'
                                           type: string
                                         divisor:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          description: Specifies the output format of the exposed resources, defaults to "1"
+                                          description: Specifies the output format
+                                            of the exposed resources, defaults to
+                                            "1"
                                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                           x-kubernetes-int-or-string: true
                                         resource:
@@ -498,16 +861,25 @@ spec:
                                       type: object
                                       x-kubernetes-map-type: atomic
                                     secretKeyRef:
-                                      description: Selects a key of a secret in the pod's namespace
+                                      description: Selects a key of a secret in the
+                                        pod's namespace
                                       properties:
                                         key:
-                                          description: The key of the secret to select from.  Must be a valid secret key.
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                                          default: ""
+                                          description: |-
+                                            Name of the referent.
+                                            This field is effectively required, but due to backwards compatibility is
+                                            allowed to be empty. Instances of this type with an empty value here are
+                                            almost certainly wrong.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                           type: string
                                         optional:
-                                          description: Specify whether the Secret or its key must be defined
+                                          description: Specify whether the Secret
+                                            or its key must be defined
                                           type: boolean
                                       required:
                                       - key
@@ -519,7 +891,9 @@ spec:
                               type: object
                             type: array
                           image:
-                            description: Docker image name overridden to the desired subset The Docker image found in the original deployment is used if this is not provided.
+                            description: |-
+                              Docker image name overridden to the desired subset
+                              The Docker image found in the original deployment is used if this is not provided.
                             type: string
                         required:
                         - containerName
@@ -534,10 +908,13 @@ spec:
                     podLabels:
                       additionalProperties:
                         type: string
-                      description: Labels to add to the pods of the deployment launched by this subset. Could be used in conjunction with 'SourceLabels' in the `IstioMatches`.
+                      description: |-
+                        Labels to add to the pods of the deployment launched by this subset. Could be used in
+                        conjunction with 'SourceLabels' in the `IstioMatches`.
                       type: object
                     replicas:
-                      description: 'Number of deployment replicas. Default is 1. Note: 0 is *invalid*.'
+                      description: 'Number of deployment replicas. Default is 1. Note:
+                        0 is *invalid*.'
                       format: int32
                       type: integer
                   required:
@@ -558,7 +935,11 @@ spec:
                     errors:
                       description: List of errors related to the consumer
                       items:
-                        description: "StatusError shows an error we want to display in the status with the last time it happened. This *does not* have to be the only time it happened. The idea is that a list of errors should only \n contain a single occurrence of an error (just the last)."
+                        description: "StatusError shows an error we want to display
+                          in the status with the last time it happened. This\n*does
+                          not* have to be the only time it happened. The idea is that
+                          a list of errors should only\n\n\tcontain a single occurrence
+                          of an error (just the last)."
                         properties:
                           error:
                             description: The error message
@@ -596,7 +977,8 @@ spec:
                 type: string
               subsetsStatus:
                 additionalProperties:
-                  description: SubsetStatus Contains aggregation of all resource status connected to set subset.
+                  description: SubsetStatus Contains aggregation of all resource status
+                    connected to set subset.
                   properties:
                     deployment:
                       description: Status of the deployment that belongs to the subset
@@ -616,9 +998,11 @@ spec:
                       - status
                       type: object
                     destinationRules:
-                      description: Status of the destination-rule that belongs to the subset
+                      description: Status of the destination-rule that belongs to
+                        the subset
                       items:
-                        description: ResourceStatus shows the status of each item created/edited by DynamicEnv
+                        description: ResourceStatus shows the status of each item
+                          created/edited by DynamicEnv
                         properties:
                           name:
                             description: The name of the resource
@@ -645,7 +1029,11 @@ spec:
                         deployment:
                           description: Subset's deployment global errors.
                           items:
-                            description: "StatusError shows an error we want to display in the status with the last time it happened. This *does not* have to be the only time it happened. The idea is that a list of errors should only \n contain a single occurrence of an error (just the last)."
+                            description: "StatusError shows an error we want to display
+                              in the status with the last time it happened. This\n*does
+                              not* have to be the only time it happened. The idea
+                              is that a list of errors should only\n\n\tcontain a
+                              single occurrence of an error (just the last)."
                             properties:
                               error:
                                 description: The error message
@@ -662,7 +1050,11 @@ spec:
                         destinationRule:
                           description: Subset's destination-rule global errors.
                           items:
-                            description: "StatusError shows an error we want to display in the status with the last time it happened. This *does not* have to be the only time it happened. The idea is that a list of errors should only \n contain a single occurrence of an error (just the last)."
+                            description: "StatusError shows an error we want to display
+                              in the status with the last time it happened. This\n*does
+                              not* have to be the only time it happened. The idea
+                              is that a list of errors should only\n\n\tcontain a
+                              single occurrence of an error (just the last)."
                             properties:
                               error:
                                 description: The error message
@@ -677,9 +1069,14 @@ spec:
                             type: object
                           type: array
                         subset:
-                          description: Errors related to subset but not to any of the launched resources
+                          description: Errors related to subset but not to any of
+                            the launched resources
                           items:
-                            description: "StatusError shows an error we want to display in the status with the last time it happened. This *does not* have to be the only time it happened. The idea is that a list of errors should only \n contain a single occurrence of an error (just the last)."
+                            description: "StatusError shows an error we want to display
+                              in the status with the last time it happened. This\n*does
+                              not* have to be the only time it happened. The idea
+                              is that a list of errors should only\n\n\tcontain a
+                              single occurrence of an error (just the last)."
                             properties:
                               error:
                                 description: The error message
@@ -696,7 +1093,11 @@ spec:
                         virtualServices:
                           description: Subset's virtual-services global errors.
                           items:
-                            description: "StatusError shows an error we want to display in the status with the last time it happened. This *does not* have to be the only time it happened. The idea is that a list of errors should only \n contain a single occurrence of an error (just the last)."
+                            description: "StatusError shows an error we want to display
+                              in the status with the last time it happened. This\n*does
+                              not* have to be the only time it happened. The idea
+                              is that a list of errors should only\n\n\tcontain a
+                              single occurrence of an error (just the last)."
                             properties:
                               error:
                                 description: The error message
@@ -712,9 +1113,11 @@ spec:
                           type: array
                       type: object
                     virtualServices:
-                      description: Status of the virtual-service that belongs to the subset
+                      description: Status of the virtual-service that belongs to the
+                        subset
                       items:
-                        description: ResourceStatus shows the status of each item created/edited by DynamicEnv
+                        description: ResourceStatus shows the status of each item
+                          created/edited by DynamicEnv
                         properties:
                           name:
                             description: The name of the resource

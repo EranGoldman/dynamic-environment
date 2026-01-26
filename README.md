@@ -85,7 +85,7 @@ cluster. You can play a little with the _memory_ and the _cpus_ but since we're 
 resources on it, it's better to give it more resources than the default:
 
 ```shell
-minikube start --kubernetes-version v1.26.3 --memory 8g --cpus 4
+minikube start --kubernetes-version v1.35.0 --memory 8g --cpus 4
 ```
 
 For the rest of the commands, make sure your _kubectl_ is operating on the minikube context:

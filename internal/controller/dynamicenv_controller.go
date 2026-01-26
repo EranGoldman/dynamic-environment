@@ -240,7 +240,7 @@ func (r *DynamicEnvReconciler) processSubsetsAndConsumers(
 		deploymentHandlers = append(deploymentHandlers, deploymentHandler)
 		if err := deploymentHandler.Handle(ctx); err != nil {
 			rls.returnError.ForceError(err)
-			rls.addDeploymentMessage(subsetName, st.Type, err.Error())
+			rls.addDeploymentMessage(subsetName, st.Type, "%s", err.Error())
 			continue
 		}
 
@@ -257,7 +257,7 @@ func (r *DynamicEnvReconciler) processSubsetsAndConsumers(
 			mrHandlers = append(mrHandlers, destinationRuleHandler)
 			if err := destinationRuleHandler.Handle(ctx); err != nil {
 				rls.returnError.ForceError(err)
-				rls.subsetMessages[subsetName] = rls.subsetMessages[subsetName].AppendDestinationRuleMsg(err.Error())
+				rls.subsetMessages[subsetName] = rls.subsetMessages[subsetName].AppendDestinationRuleMsg("%s", err.Error())
 				continue
 			}
 

@@ -19,7 +19,8 @@ package watches
 import (
 	"context"
 	"fmt"
-	"github.com/riskified/dynamic-environment/pkg/helpers"
+	"strings"
+
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/utils/strings/slices"
@@ -27,7 +28,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"strings"
+
+	"github.com/riskified/dynamic-environment/pkg/helpers"
 )
 
 const (
@@ -38,31 +40,31 @@ const (
 
 type EnqueueRequestForAnnotation struct{}
 
-var _ handler.EventHandler = &EnqueueRequestForAnnotation{}
+var _ handler.TypedEventHandler[client.Object, reconcile.Request] = &EnqueueRequestForAnnotation{}
 
 // Create is called in response to an 'add' event.
-func (e *EnqueueRequestForAnnotation) Create(_ context.Context, evt event.CreateEvent, q workqueue.RateLimitingInterface) {
+func (e *EnqueueRequestForAnnotation) Create(_ context.Context, evt event.TypedCreateEvent[client.Object], q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	addToQueue(evt.Object, q)
 }
 
 // Update is called in response to an update event.
-func (e *EnqueueRequestForAnnotation) Update(_ context.Context, evt event.UpdateEvent, q workqueue.RateLimitingInterface) {
+func (e *EnqueueRequestForAnnotation) Update(_ context.Context, evt event.TypedUpdateEvent[client.Object], q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	addToQueue(evt.ObjectNew, q)
 	addToQueue(evt.ObjectOld, q)
 }
 
 // Delete is called in response to a 'delete' event.
-func (e *EnqueueRequestForAnnotation) Delete(_ context.Context, evt event.DeleteEvent, q workqueue.RateLimitingInterface) {
+func (e *EnqueueRequestForAnnotation) Delete(_ context.Context, evt event.TypedDeleteEvent[client.Object], q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	addToQueue(evt.Object, q)
 }
 
-// GenericFunc is called in response to a generic event.
-func (e *EnqueueRequestForAnnotation) Generic(_ context.Context, evt event.GenericEvent, q workqueue.RateLimitingInterface) {
+// Generic is called in response to a generic event.
+func (e *EnqueueRequestForAnnotation) Generic(_ context.Context, evt event.TypedGenericEvent[client.Object], q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	addToQueue(evt.Object, q)
 }
 
 // addToQueue converts annotations defined for NamespacedNameAnnotation as a comma-separated list and add them to queue.
-func addToQueue(object client.Object, q workqueue.RateLimitingInterface) {
+func addToQueue(object client.Object, q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	annotations := object.GetAnnotations()
 	if annotations != nil {
 		dynamicEnvs := strings.Split(annotations[NamespacedNameAnnotation], ",")
